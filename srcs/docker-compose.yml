@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    expose:
+      - "3306"
+    networks:
+      - inception
+    restart: unless-stopped
+    env_file:
+      - .env
+    healthcheck:
+      test: mysqladmin ping --host=localhost -p${DB_ROOT_PASSWORD}
+      interval: 5s
+      timeout: 1s
+      retries: 20
+      start_period: 5s
+
+  wordpress:
+     image: wordpress_custom:latest
+     build:
+       context: ./requirements/wordpress
+       dockerfile: Dockerfile
+     volumes:
+       - wordpress:/var/www/html/
+     env_file:
+      - .env
+     init: true
+     networks:
+       - inception
+     depends_on:
+        mariadb:
+          condition: service_healthy
+     restart: unless-stopped
+
+  nginx:
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    image: nginx_custom:latest
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress:/var/www/html
+    environment:
+      - DOMAIN_NAME=motero.42.fr
+      - CERTS=/etc/nginx/ssl/inception.crt
+      - CERTS_KEY=/etc/nginx/ssl/inception.key
+    restart: unless-stopped
+    networks:
+      - inception
+    depends_on:
+      - wordpress
+    healthcheck:
+      test: ["CMD", "curl", "-kfsSL", "https://localhost:443"]
+      interval: 5s
+      timeout: 1s
+      retries: 20
+      start_period: 5s
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/motero/data/mariadb
+      o: bind
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/motero/data/wordpress
+      o: bind
+
+networks:
+  inception:
+    name: inception
+    driver: bridge
