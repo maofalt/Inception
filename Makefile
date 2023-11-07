@@ -6,6 +6,7 @@ build:
 	mkdir -p ~/data
 	mkdir -p ~/data/mariadb
 	mkdir -p ~/data/wordpress
+	mkdir -p ~/data/static_site
 	docker compose -f $(COMPOSE_FILE) build
 
 up:

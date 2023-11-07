@@ -74,6 +74,17 @@ services:
     networks:
       - inception
     
+  static_site:
+    build:
+      context: ./requirements/bonus/Static_website
+      dockerfile: Dockerfile
+    image: static_site
+    volumes:
+      - static_site:/usr/local/apache2/htdocs/
+    networks:
+      - inception
+    expose:
+      - "80"
 
 volumes:
   mariadb_data:
@@ -87,6 +98,12 @@ volumes:
     driver_opts:
       type: none
       device: /home/motero/data/wordpress
+      o: bind
+  static_site:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/motero/data/static_site
       o: bind
 
 networks:

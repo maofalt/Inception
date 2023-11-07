@@ -60,7 +60,9 @@ fi
 echo "Adding iframe and button to the homepage content..."
 IFRAME_CODE='<iframe src="https://motero.42.fr/doom" width="600" height="400"></iframe>'
 BUTTON_CODE='<button onclick="window.location.href='\'https://motero.42.fr/?page_id=0\''">Go to ID 0</button>'
-NEW_CONTENT="Welcome to my website! $IFRAME_CODE $BUTTON_CODE"
+BUTTON_CODE_STATIC='<button onclick="window.location.href='\''https://motero.42.fr/static/'\''">Visit Static Site</button>'
+
+NEW_CONTENT="Welcome to my website! $IFRAME_CODE $BUTTON_CODE $BUTTON_CODE_STATIC"
 
 wp post update $HOMEPAGE_ID --post_content="$NEW_CONTENT" --post_status=publish --allow-root --path='/var/www/html'
 
