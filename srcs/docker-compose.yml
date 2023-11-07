@@ -65,6 +65,16 @@ services:
       retries: 20
       start_period: 5s
 
+  doom:
+    build:
+      context: ./requirements/bonus/doom
+      dockerfile: Dockerfile
+    image:
+      doom_web
+    networks:
+      - inception
+    
+
 volumes:
   mariadb_data:
     driver: local
